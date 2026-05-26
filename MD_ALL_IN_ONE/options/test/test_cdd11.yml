@@ -1,0 +1,152 @@
+name: ICLR_CDD11
+suffix: ~  
+model_type: SRModel
+scale: 1
+crop_border: 0  
+num_gpu: 1  
+manual_seed: 0
+
+datasets:
+  test_1:
+    name: haze
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/haze
+    io_backend:
+      type: disk
+
+  test_2:
+    name: haze_rain
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/haze_rain
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_3:
+    name: haze_snow
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/haze_snow
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_4:
+    name: low
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_5:
+    name: low_haze
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_haze
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_6:
+    name: low_haze_rain
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_haze_rain
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_7:
+    name: low_haze_snow
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_haze_snow
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_8:
+    name: snow
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/snow
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_9:
+    name: low_rain
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_rain
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_10:
+    name: low_snow
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_snow
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_11:
+    name: rain
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/rain
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+# network structures
+network_g:
+  type: DualPromptRestormerv3_only_task_prompt
+  img_channel: 3
+  # dim: None
+  # width: None
+  enc_blk_nums: [4, 6, 6] 
+  middle_blk_num: 8       
+  dec_blk_nums: [6, 6, 4]
+  refine_blk_num: 4    
+  heads: [1, 2, 4, 8]
+  ffn_expansion_factor: 2.66
+  # bias: False
+  LayerNorm_type: 'WithBias'
+  
+  # 提示池配置
+  use_prompt: true
+  degradation_pool_size: 15
+  degradation_prompt_dim: 1024
+  degradation_top_k: 3
+  value_num_tokens: 2  
+  fusion_method: 'cross_attention'  
+
+
+# path
+path:
+  pretrain_network_g: ~
+  strict_load_g: true
+  resume_state: ~
+  # param_key: params_ema
+
+# validation settings
+val:
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+  pbar: true
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+    ssim:
+      type: calculate_ssim
+      crop_border: 0
+      test_y_channel: false

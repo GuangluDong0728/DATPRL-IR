@@ -1,0 +1,111 @@
+name: ICLR_3Domain_6TASK
+suffix: ~  
+model_type: ALLINONEModel
+scale: 1
+crop_border: 0  
+num_gpu: 1  # set num_gpu: 0 for cpu mode
+manual_seed: 0
+
+datasets:
+  test_1:
+    name: UCMerced
+    type: PairedImageDataset
+    dataroot_gt: MDAIOIR/ucmerced/test/test_hr
+    dataroot_lq: MDAIOIR/ucmerced/test/test_bicubic_x4
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_2:
+    name: CUHK
+    type: PairedImageDataset
+    dataroot_gt: MDAIOIR/CUHK_CR1/test/label
+    dataroot_lq: MDAIOIR/CUHK_CR1/test/cloud
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_3:
+    name: Rain100L
+    type: PairedImageDataset
+    dataroot_gt: Rain100L/target
+    dataroot_lq: Rain100L/input
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_4:
+    name: AAPM_CT_Denoising
+    type: PairedImageDataset
+    dataroot_gt: MDAIOIR/CT/test/HQ_png
+    dataroot_lq: MDAIOIR/CT/test/LQ_png
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_5:
+    name: IXI_MRI_SR
+    type: PairedImageDataset
+    dataroot_gt: MDAIOIR/MRI/test/HQ_png
+    dataroot_lq: MDAIOIR/MRI/test/LQ_png
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  test_6:
+    name: DIV2K_VAL_SR
+    type: PairedImageDataset
+    dataroot_gt: MDAIOIR/div2k_val/DIV2K_valid_HR_sp
+    dataroot_lq: MDAIOIR/div2k_val/DIV2K_test_LR_bicubicx4_sp
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+network_g:
+  type: DualPromptRestormerv3
+  img_channel: 3
+  # dim: None
+  # width: None
+  enc_blk_nums: [4, 6, 6] 
+  middle_blk_num: 8       
+  dec_blk_nums: [6, 6, 4]
+  refine_blk_num: 4    
+  heads: [1, 2, 4, 8]
+  ffn_expansion_factor: 2.66
+  # bias: False
+  LayerNorm_type: 'WithBias'
+  
+  # 提示池配置
+  use_prompt: true
+  domain_pool_size: 15
+  degradation_pool_size: 15
+  domain_prompt_dim: 1024
+  degradation_prompt_dim: 1024
+  domain_top_k: 5
+  degradation_top_k: 3
+  value_num_tokens: 2  
+  prompt_fusion_method: 'cross_attention'  
+  fusion_method: 'cross_attention'  
+
+# path
+path:
+  pretrain_network_g: experiments/ICLR_6TASK/net_g_1000000.pth
+  # param_key_g: params_ema
+
+# validation settings
+val:
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+  pbar: true
+
+  num_val_datasets: 6
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+    ssim:
+      type: calculate_ssim
+      crop_border: 0
+      test_y_channel: false

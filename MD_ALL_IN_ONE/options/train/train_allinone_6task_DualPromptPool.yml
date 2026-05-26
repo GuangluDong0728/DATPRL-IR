@@ -1,0 +1,238 @@
+# general settings
+name: ALLINONE_6TASK_DualPromptRestormerv3
+model_type: MultiModalSRv3Model 
+scale: 1
+num_gpu: 1
+manual_seed: 42
+
+# dataset and data loader settings
+datasets:
+  train:
+    name: MultiDatasetPairedImageDataset
+    type: MultiDatasetPairedImageDataset
+    
+    batch_size: 12 
+
+    phase: train
+    gt_size: 128       
+    scale: 1          
+    use_hflip: true    
+    use_rot: true     
+    
+    # Configuration for 6 datasets
+    datasets:
+      # Dataset 1
+      - name: "DF2K_SR"
+        dataroot_gt: "DF2K/mnt/dgl/DF2K/train"
+        dataroot_lq: "DF2K/mnt/dgl/DF2K/train_x4_bicubic"
+        augment_factor: 12    
+        weight: 1.0         
+        io_backend:
+          type: disk
+        filename_tmpl: "{}"
+        
+      # Dataset 2
+      - name: "UCMerced_Remote_SR"
+        dataroot_gt: "UCMerced_dataset/mnt/dgl/UCMerced_LandUse/ALL_splite_for_train_test/train/train_hr"
+        dataroot_lq: 'UCMerced_dataset/mnt/dgl/UCMerced_LandUse/ALL_splite_for_train_test/train/train_bicubic_x4'
+        augment_factor: 22   
+        weight: 1.0
+        io_backend:
+          type: disk
+        
+      # Dataset 3
+      - name: "IXI_MRI_SR"
+        dataroot_gt: "MRI/HQ_png"
+        dataroot_lq: "MRI/LQ_png"
+        augment_factor: 1    
+        weight: 1.0          
+        io_backend:
+          type: disk
+          
+      # Dataset 4
+      - name: "Rain100L_Derain"
+        dataroot_gt: "Rain100L/norain"
+        dataroot_lq: "Rain100L/rain"
+        augment_factor: 200   
+        weight: 1.0
+        io_backend:
+          type: disk
+          
+      # Dataset 5
+      - name: "CUHK_Remote_Decloud"
+        dataroot_gt: "CUHK/mnt/dgl/CUHK-CR1/train/label"
+        dataroot_lq: "CUHK/mnt/dgl/CUHK-CR1/train/cloud"
+        augment_factor: 75    
+        weight: 1.2
+        io_backend:
+          type: disk
+          
+      # Dataset 6
+      - name: "AAPM_CT_Denoising"
+        dataroot_gt: "CT/HQ_png"
+        dataroot_lq: "CT/LQ_png"
+        augment_factor: 2  
+        weight: 1.1
+        io_backend:
+          type: disk
+
+    # data loader
+    num_worker_per_gpu: 6
+    batch_size_per_gpu: 12
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  val_1:
+    name: UCMerced
+    type: PairedImageDataset
+    dataroot_gt: UCMerced_dataset/mnt/dgl/UCMerced_LandUse/ALL_splite_for_train_test/test/test_hr
+    dataroot_lq: UCMerced_dataset/mnt/dgl/UCMerced_LandUse/ALL_splite_for_train_test/test/test_bicubic_x4
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  val_2:
+    name: CUHK
+    type: PairedImageDataset
+    dataroot_gt: CUHK/mnt/dgl/CUHK-CR1/test/label
+    dataroot_lq: CUHK/mnt/dgl/CUHK-CR1/test/cloud
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  val_3:
+    name: Rain100L
+    type: PairedImageDataset
+    dataroot_gt: Rain100L/dgl/Rain13k/Rain100L/target
+    dataroot_lq: Rain100L/dgl/Rain13k/Rain100L/input
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  val_4:
+    name: AAPM_CT_Denoising
+    type: PairedImageDataset
+    dataroot_gt: CT/test/HQ_png
+    dataroot_lq: CT/test/LQ_png
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+network_g:
+  type: DualPromptRestormerv3
+  img_channel: 3
+  # dim: None
+  # width: None
+  enc_blk_nums: [4, 6, 6] 
+  middle_blk_num: 8       
+  dec_blk_nums: [6, 6, 4]
+  refine_blk_num: 4    
+  heads: [1, 2, 4, 8]
+  ffn_expansion_factor: 2.66
+  # bias: False
+  LayerNorm_type: 'WithBias'
+  
+  # 提示池配置
+  use_prompt: true
+  domain_pool_size: 15
+  degradation_pool_size: 15
+  domain_prompt_dim: 1024
+  degradation_prompt_dim: 1024
+  domain_top_k: 5
+  degradation_top_k: 3
+  value_num_tokens: 2
+  prompt_fusion_method: 'cross_attention'  
+  fusion_method: 'cross_attention'  
+
+# path
+path:
+  pretrain_network_g: ~
+  param_key_g: params
+
+# training settings
+train:
+  optim_g:
+    type: Adam
+    lr: !!float 4e-4
+    weight_decay: 0
+    betas: [0.9, 0.99]
+  
+  prompt_lr: !!float 4e-4  
+  
+  scheduler:
+    type: CosineAnnealingRestartLR
+    periods: [1000000]
+    restart_weights: [1]
+    eta_min: !!float 1e-6
+
+  warmup_iter: 0
+
+  use_amp: true
+  grad_clip: 1.0
+  
+  total_iter: 1000000
+  # warmup_iter: -1  # no warm up
+
+  # 基础损失函数
+  pixel_opt:
+    type: L1Loss
+    loss_weight: 1.0
+    reduction: mean
+  fft_opt:
+    type: FFTLoss
+    loss_weight: 0.1
+  
+  # CLIP文本编码约束
+  use_clip_constraint: true
+  clip_model: 'RN50'  
+  clip_alignment_weight: !!float 1.0 # CLIP对齐损失权重
+  
+  # 文本描述文件路径列表
+  text_description_paths:
+    - 'llava_output_new_DF2K.json'
+    - 'llava_output_new_UCMerced.json'
+    - 'llava_output_new_MRI.json'
+    - 'llava_output_new_rain100l.json'
+    - 'llava_output_new_CUHK.json'
+    - 'llava_output_new_CT.json'
+  
+  prompt_diversity_weight: !!float 1.0 
+  diversity_temperature: !!float 0.1     
+  
+  prompt_balance_weight: !!float 0.1  
+  stats_update_freq: 5000                
+  reinit_prompts: false                 
+
+  prompt_contrastive_weight: 0.1 
+
+  # 训练时的提示分析设置
+  enable_prompt_analysis: false           
+  prompt_analysis_freq: 50000           
+  prompt_analysis_save_path: './prompt_analysis' 
+
+# validation settings
+val:
+  val_freq: !!float 10000
+  save_img: false
+  pbar: true
+
+  metrics:
+    psnr:
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+    ssim:
+      type: calculate_ssim
+      crop_border: 0
+      test_y_channel: false
+
+# logging settings
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 10000
+  use_tb_logger: true
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500

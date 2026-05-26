@@ -1,0 +1,317 @@
+# general settings
+name: ALLINONE_CDD11_DualPromptRestormerv3_only_task_prompt
+model_type: ALLINONEModel  
+scale: 1
+num_gpu: 1
+manual_seed: 42
+
+datasets:
+  train:
+    name: MultiTaskAllInOneDataset
+    type: MultiTaskAllInOneDataset
+    batch_size: 5
+
+    phase: train
+    gt_size: 128
+    scale: 1
+    use_hflip: true
+    use_rot: true
+
+    datasets:
+      - name: haze
+        mode: paired
+        dataroot_gt: datasets/CDD-11_train/clear
+        dataroot_lq: datasets/CDD-11_train/haze
+        augment_factor: 1
+        weight: 1.0
+        io_backend:
+          type: disk
+        filename_tmpl: '{}'
+
+      - name: haze_rain
+        mode: paired
+        dataroot_gt: datasets/CDD-11_train/clear
+        dataroot_lq: datasets/CDD-11_train/haze_rain
+        augment_factor: 1
+        weight: 1.0
+        io_backend:
+          type: disk
+        filename_tmpl: '{}'
+
+      - name: haze_snow
+        mode: paired
+        dataroot_gt: datasets/CDD-11_train/clear
+        dataroot_lq: datasets/CDD-11_train/haze_snow
+        augment_factor: 1
+        weight: 1.0
+        io_backend:
+          type: disk
+        filename_tmpl: '{}'
+
+      - name: low
+        mode: paired
+        dataroot_gt: datasets/CDD-11_train/clear
+        dataroot_lq: datasets/CDD-11_train/low
+        augment_factor: 1
+        weight: 1.0
+        io_backend:
+          type: disk
+
+      - name: low_haze
+        mode: paired
+        dataroot_gt: datasets/CDD-11_train/clear
+        dataroot_lq: datasets/CDD-11_train/low_haze
+        augment_factor: 1
+        weight: 1.0
+        io_backend:
+          type: disk
+        filename_tmpl: '{}'
+
+      - name: low_haze_rain
+        mode: paired
+        dataroot_gt: datasets/CDD-11_train/clear
+        dataroot_lq: datasets/CDD-11_train/low_haze_rain
+        augment_factor: 1
+        weight: 1.0
+        io_backend:
+          type: disk
+        filename_tmpl: '{}'
+
+      - name: low_haze_snow
+        mode: paired
+        dataroot_gt: datasets/CDD-11_train/clear
+        dataroot_lq: datasets/CDD-11_train/low_haze_snow
+        augment_factor: 1
+        weight: 1.0
+        io_backend:
+          type: disk
+        filename_tmpl: '{}'
+
+      - name: low_rain
+        mode: paired
+        dataroot_gt: datasets/CDD-11_train/clear
+        dataroot_lq: datasets/CDD-11_train/low_rain
+        augment_factor: 1
+        weight: 1.0
+        io_backend:
+          type: disk
+
+      - name: low_snow
+        mode: paired
+        dataroot_gt: datasets/CDD-11_train/clear
+        dataroot_lq: datasets/CDD-11_train/low_snow
+        augment_factor: 1
+        weight: 1.0
+        io_backend:
+          type: disk
+        filename_tmpl: '{}'
+
+      - name: rain
+        mode: paired
+        dataroot_gt: datasets/CDD-11_train/clear
+        dataroot_lq: datasets/CDD-11_train/rain
+        augment_factor: 1
+        weight: 1.0
+        io_backend:
+          type: disk
+        filename_tmpl: '{}'
+
+      - name: snow
+        mode: paired
+        dataroot_gt: datasets/CDD-11_train/clear
+        dataroot_lq: datasets/CDD-11_train/snow
+        augment_factor: 1
+        weight: 1.0
+        io_backend:
+          type: disk
+        filename_tmpl: '{}'
+
+    num_worker_per_gpu: 6
+    batch_size_per_gpu: 5
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  val_1:
+    name: haze
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/haze
+    io_backend:
+      type: disk
+
+  val_2:
+    name: haze_rain
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/haze_rain
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  val_3:
+    name: haze_snow
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/haze_snow
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  val_4:
+    name: low
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  val_5:
+    name: low_haze
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_haze
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  val_6:
+    name: low_haze_rain
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_haze_rain
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  val_7:
+    name: low_haze_snow
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_haze_snow
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  val_8:
+    name: snow
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/snow
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  val_9:
+    name: low_rain
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_rain
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  val_10:
+    name: low_snow
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_snow
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+  val_11:
+    name: rain
+    type: PairedImageDataset
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/rain
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+network_g:
+  type: DualPromptRestormerv3_only_task_prompt
+  img_channel: 3
+  # dim: None
+  # width: None
+  enc_blk_nums: [4, 6, 6] 
+  middle_blk_num: 8       
+  dec_blk_nums: [6, 6, 4]
+  refine_blk_num: 4    
+  heads: [1, 2, 4, 8]
+  ffn_expansion_factor: 2.66
+  # bias: False
+  LayerNorm_type: 'WithBias'
+  
+  # 提示池配置
+  use_prompt: true
+  degradation_pool_size: 15
+  degradation_prompt_dim: 1024
+  degradation_top_k: 3
+  value_num_tokens: 2  
+  fusion_method: 'cross_attention'
+
+# path
+path:
+  pretrain_network_g: ~
+  param_key_g: params
+  strict_load_g: true
+
+# training settings
+train:
+
+  optim_g:
+    type: Adam
+    lr: !!float 2e-4
+    weight_decay: 0
+    betas: [0.9, 0.99]
+  
+  # # 提示池专用学习率 
+  # prompt_lr: !!float 2e-4 
+  
+  scheduler:
+    type: MultiStepLR
+    milestones: [200000, 400000, 600000, 800000]
+    # milestones: [100000]
+    gamma: 0.5
+
+  total_iter: 1000000
+  warmup_iter: -1  # no warm up
+
+  # 基础损失函数
+  pixel_opt:
+    type: L1Loss
+    loss_weight: 1.0
+    reduction: mean
+  fft_opt:
+    type: FFTLoss
+    loss_weight: 0.1
+
+# validation settings
+val:
+  val_freq: !!float 50000
+  save_img: false
+  pbar: true
+
+  num_val_datasets: 11
+
+  metrics:
+    psnr:
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+    ssim:
+      type: calculate_ssim
+      crop_border: 0
+      test_y_channel: false
+
+# logging settings
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 50000
+  use_tb_logger: true
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500
