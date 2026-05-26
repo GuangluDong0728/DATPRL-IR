@@ -121,21 +121,21 @@ Visual inference results for the natural-image mixed-degradation CDD11 setting a
 #### Quantitative results
 
 <p align="left">
-  <em>Qualitative results on 5-Task natural image AiOIR.</em>
+  <em>Quantitative results on 5-Task natural image AiOIR.</em>
 </p>
 <p align="left">
   <img src="figure/5task.jpg" width="80%">
 </p>
 
 <p align="left">
-  <em>Qualitative results on 3-Task natural image AiOIR.</em>
+  <em>Quantitative results on 3-Task natural image AiOIR.</em>
 </p>
 <p align="left">
   <img src="figure/3task.jpg" width="80%">
 </p>
 
 <p align="left">
-  <em>Qualitative results on mixed-degradation natural image AiOIR with CDD11 dataset.</em>
+  <em>Quantitative results on mixed-degradation natural image AiOIR with CDD11 dataset.</em>
 </p>
 <p align="left">
   <img src="figure/cdd11.jpg" width="80%">
